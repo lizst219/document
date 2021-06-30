@@ -1,0 +1,49 @@
+//Ho va ten: TRUONG VAN HUNG
+//MSSV: 1755252021600044
+#include <REGX52.H>
+#include <RTX51TNY.H>        
+#define INIT 0               
+#define DO 1                 
+#define BUTT 2             
+sbit LED_DO = P1^2;          
+sbit BUTTON = P1^3;          
+void USART(void) interrupt 4 
+{
+ if(RI)                      
+ { //Clear flag
+ RI=0; //Nhan ki tu 
+ isr_send_signal(DO);        
+ }
+}
+//=========Ham Start up==========
+void Startup(void) task INIT
+{ 
+ SCON=0x52;                 
+ TMOD=0x21;                 
+ TH1=TL1=-3;               
+ TR1=1;
+ IE=0x90;                    
+ os_create_task (DO);        
+ os_create_task (BUTT);    
+ os_delete_task (INIT);      
+}
+void Task_Led_Do(void) task DO 
+{
+ while(1)
+ { 
+ os_wait2(K_SIG ,50);        
+ LED_DO ^= 1;                
+ }
+}
+void Task_BUTTON(void) task BUTT
+{
+ while(1)
+ {
+ if(BUTTON == 0)            
+ {
+ os_send_signal(DO);         
+ while(BUTTON==0);           
+ }
+ os_wait2(K_TMO, 10);      
+ }
+}
