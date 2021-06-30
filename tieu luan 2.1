@@ -1,0 +1,41 @@
+//Ho va ten: TRUONG VAN HUNG
+//MSSV: 1755252021600033
+#include <REGX52.H>
+
+void delay_ms(int ms)
+{
+	while(ms--)
+	{
+		TH0 = 0xFC;
+		TL0 = 0x18;
+		TR0 = 1;
+		while(!TF0);
+		TF0 = 0;
+		TR0 = 0;
+	}
+}
+
+void main()
+{
+	EX0 = 1;
+	IT0 = 1;
+	EA = 1;
+	while(1)
+	{
+		P2 = 0;
+		delay_ms(1000);
+		P2 = 0xFF;
+		delay_ms(1000);
+	}
+}
+
+void ngat() interrupt 0
+{
+	long a = 50000;
+	P1_3 = 0;
+	while(a--)
+	{
+		;
+	}
+	P1_3 = 1;
+}
